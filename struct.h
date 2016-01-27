@@ -61,6 +61,18 @@ float v;
   float y;
 }                                       t_coor;
 
+typedef struct          s_line
+{
+  int dx;
+  int dy;
+  int i;
+  int xinc;
+  int yinc;
+  int cumul;
+  int x;
+  int y;
+}                                       t_line;
+
 void draw_line_on_img(t_img *myimg,float xi, float yi, float xf, float yf, int color);
 void place_img(t_struct *param, float xd, float yd);
 void img_move(int keycode, t_struct *param);
@@ -97,5 +109,8 @@ char ***set_coordp(t_struct *param, float x, float y, int index);
 t_coor *else_coorp(t_coor *coor, t_struct *param, int index);
 t_coor *start_coorp(t_coor *coor, int x, int y);
 t_coor *give_coorp(t_coor *coor, t_struct *param);
-
+t_line *give_line(float xi, float yi, float xf, float yf);
+t_line *first_while(t_line *line);
+t_line *second_while(t_line *line);
+t_line *norme_line(t_line *line);
 #endif

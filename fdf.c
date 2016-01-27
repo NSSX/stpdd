@@ -22,36 +22,81 @@ int couleur(double t)
   return ((RGB(127.5 * (cos(t) + 1), 127.5 * (sin(t) + 1), 127.5 * (1 - cos(t)))));
 }
 
+t_line *give_line(float xi, float yi, float xf, float yf)
+{
+  t_line *line;
+
+  line = (t_line *)malloc(sizeof(t_line) * 12);
+  line->x = xi ;
+  line->y = yi ;
+  line->dx = xf - xi ;
+  line->dy = yf - yi ;
+  line->xinc = ( line->dx > 0 ) ? 1 : -1;
+  line->yinc = ( line->dy > 0 ) ? 1 : -1;
+  line->dx = abs(line->dx);
+  line->dy = abs(line->dy);
+  return (line);
+}
+
+t_line *first_while(t_line *line)
+{
+  line->x += line->xinc ;
+  line->cumul += line->dy ;
+  if (line->cumul >= line->dx)
+    {
+      line->cumul -= line->dx ;
+      line->y += line->yinc ;
+    }
+  return (line);
+}
+
+
+t_line *second_while(t_line *line)
+{
+  line->y += line->yinc ;
+  line->cumul += line->dx ;
+  if (line->cumul >= line->dy)
+    {
+      line->cumul -= line->dy ;
+      line->x += line->xinc ;
+    }
+  return (line);
+}
+
+t_line *norme_line(t_line *line)
+{
+  line->cumul = line->dy / 2 ;
+  line->i = 1;
+  return (line);
+}
+
 void draw_line_on_img(t_img *myimg,float xi, float yi, float xf, float yf, int color)
 {
-  int dx,dy,i,xinc,yinc,cumul,x,y ;
-  x = xi ;
-  y = yi ;
-  dx = xf - xi ;
-  dy = yf - yi ;
-  xinc = ( dx > 0 ) ? 1 : -1 ;
-  yinc = ( dy > 0 ) ? 1 : -1 ;
-  dx = abs(dx) ;
-  dy = abs(dy) ;
-  my_pixel_put_to_image(myimg, x, y, color);
-  if ( dx > dy ) {
-    cumul = dx / 2 ;
-    for ( i = 1 ; i <= dx ; i++ ) {
-      x += xinc ;
-      cumul += dy ;
-      if ( cumul >= dx ) {
-	cumul -= dx ;
-	y += yinc ; }
-      my_pixel_put_to_image(myimg, x, y, color); } }
-  else {
-    cumul = dy / 2 ;
-    for ( i = 1 ; i <= dy ; i++ ) {
-      y += yinc ;
-      cumul += dx ;
-      if ( cumul >= dy ) {
-	cumul -= dy ;
-	x += xinc ; }
-      my_pixel_put_to_image(myimg, x, y, color); } }
+  t_line *line;
+ 
+  line = give_line(xi, yi, xf, yf); 
+  my_pixel_put_to_image(myimg, line->x, line->y, color);
+  if (line->dx > line->dy) 
+    {
+      line->cumul = line->dx / 2 ;
+      line->i = 1;
+      while(line->i <= line->dx)
+	{
+	  line = first_while(line);
+	  my_pixel_put_to_image(myimg, line->x, line->y, color);
+	  line->i++;
+	}
+    }
+  else 
+    {
+      line = norme_line(line);
+      while(line->i <= line->dy)
+	{
+	  line = second_while(line);
+	  my_pixel_put_to_image(myimg, line->x, line->y, color);
+	  line->i++;
+	}
+    }
 }
 
 static char *ft_join(char const *s1, char const *s2, int len1, int len2)
